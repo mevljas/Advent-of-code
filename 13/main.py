@@ -11,10 +11,10 @@ def read_file(filename):
     folds = []
     max_x = 0
     max_y = 0
-    with open(filename, 'r', encoding='UTF-8') as file:
+    with open(filename, "r", encoding="UTF-8") as file:
         for line in file:
-            if ',' in line:
-                x, y = line.strip().split(',')
+            if "," in line:
+                x, y = line.strip().split(",")
                 x = int(x)
                 y = int(y)
                 dots.append([x, y])
@@ -41,13 +41,13 @@ def fold_paper_once(paper, folds):
     :return: folded paper once
     """
     for axis, value in folds:
-        if axis == 'x':
+        if axis == "x":
             for i in range(0, len(paper)):
                 for j in range(value + 1, len(paper[i])):
                     if paper[i][j]:
                         paper[i][value - (j - value)] = paper[i][j]
                         paper[i][j] = 0
-        elif axis == 'y':
+        elif axis == "y":
             for i in range(value + 1, len(paper)):
                 for j in range(0, len(paper[i])):
                     if paper[i][j]:
@@ -78,18 +78,19 @@ def fold_paper(paper, folds):
     :return: folded paper
     """
     for axis, value in folds:
-        if axis == 'x':
+        if axis == "x":
             for i in range(0, len(paper)):
                 for j in range(value + 1, len(paper[i])):
                     if paper[i][j]:
                         paper[i][value - (j - value)] = paper[i][j]
                         paper[i][j] = 0
-        elif axis == 'y':
+        elif axis == "y":
             for i in range(value + 1, len(paper)):
                 for j in range(0, len(paper[i])):
                     if paper[i][j]:
                         paper[value - (i - value)][j] = paper[i][j]
                         paper[i][j] = 0
+
 
 def save_to_file(paper):
     """
@@ -109,8 +110,8 @@ def save_to_file(paper):
     f.close()
 
 
-if __name__ == '__main__':
-    paper, folds = read_file('input.txt')
+if __name__ == "__main__":
+    paper, folds = read_file("input.txt")
     # print(paper)
     # print(folds)
     # fold_paper_once(paper, folds)

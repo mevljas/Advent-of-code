@@ -8,9 +8,11 @@ def read_file(filename):
     :return: list of locations
     """
     locations = []
-    with open(filename, 'r', encoding='UTF-8') as file:
+    with open(filename, "r", encoding="UTF-8") as file:
         for line in file:
-            locations.append([[int(location), False, False] for location in line.strip()])
+            locations.append(
+                [[int(location), False, False] for location in line.strip()]
+            )
     return locations
 
 
@@ -86,12 +88,14 @@ def find_basin(marked_locations, i, j):
     :return: modified marked locations and found basins
     """
     basins = []
-    if i == len(marked_locations) \
-            or j == len(marked_locations[i]) \
-            or marked_locations[i][j][0] == 9 \
-            or marked_locations[i][j][2] \
-            or i == -1 \
-            or j == -1:
+    if (
+        i == len(marked_locations)
+        or j == len(marked_locations[i])
+        or marked_locations[i][j][0] == 9
+        or marked_locations[i][j][2]
+        or i == -1
+        or j == -1
+    ):
         return [marked_locations, basins]
 
     marked_locations[i][j][2] = True
@@ -116,8 +120,8 @@ def find_basin(marked_locations, i, j):
     return [marked_locations, basins]
 
 
-if __name__ == '__main__':
-    locations = read_file('input.txt')
+if __name__ == "__main__":
+    locations = read_file("input.txt")
     # print(locations)
     marked_locations = mark_low_points(locations)
     # print(marked_locations)

@@ -10,7 +10,7 @@ def read_file(filename):
     pairs = defaultdict(int)
     chars = defaultdict(int)
     rules = dict()
-    with open(filename, 'r', encoding='UTF-8') as file:
+    with open(filename, "r", encoding="UTF-8") as file:
         for line in file:
             line = line.strip()
             if not line:
@@ -48,8 +48,8 @@ def par_insertion(pairs, chars, rules, steps):
     return pairs, chars
 
 
-if __name__ == '__main__':
-    pairs, chars, rules = read_file('input.txt')
+if __name__ == "__main__":
+    pairs, chars, rules = read_file("input.txt")
     # pairs, chars = par_insertion(pairs, chars, rules, 10)
     pairs, chars = par_insertion(pairs, chars, rules, 40)
-    print(max(chars.values())-min(chars.values()))
+    print(max(chars.values()) - min(chars.values()))

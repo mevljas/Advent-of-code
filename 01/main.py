@@ -5,7 +5,7 @@ def read_file(filename):
     :return: list of read numbers
     """
     numbers = []
-    with open(filename, 'r', encoding='UTF-8') as file:
+    with open(filename, "r", encoding="UTF-8") as file:
         for line in file:
             numbers.append(int(line.strip()))
 
@@ -30,15 +30,15 @@ def count_greater_numbers(numbers):
 
 def count_greater_windows(numbers):
     """
-        Count cases when the next window ob numbers was greater than the one before it.
-        :param numbers: list of numbers.
-        :return:
+    Count cases when the next window ob numbers was greater than the one before it.
+    :param numbers: list of numbers.
+    :return:
     """
     previous_sum = None
     counter = 0
 
     for i in range(0, len(numbers) - 2):
-        current_sum = sum(numbers[i: i + 3])
+        current_sum = sum(numbers[i : i + 3])
         if previous_sum and current_sum > previous_sum:
             counter += 1
 
@@ -47,7 +47,7 @@ def count_greater_windows(numbers):
     print(f"Number of greater windows is {counter}.")
 
 
-if __name__ == '__main__':
-    numbers = read_file('input.txt')
+if __name__ == "__main__":
+    numbers = read_file("input.txt")
     count_greater_numbers(numbers)
     count_greater_windows(numbers)

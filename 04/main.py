@@ -9,8 +9,8 @@ def read_file(filename):
     """
     called_numbers = []
     boards = []
-    with open(filename, 'r', encoding='UTF-8') as file:
-        called_numbers = file.readline().strip().split(',')
+    with open(filename, "r", encoding="UTF-8") as file:
+        called_numbers = file.readline().strip().split(",")
         for line in file:
             board = []
             for i in range(0, 5):
@@ -143,8 +143,9 @@ def find_last_board(called_numbers, boards):
 
     return find_last_board(called_numbers[1:], boards_copy)
 
-if __name__ == '__main__':
-    random_numbers, boards = read_file('input.txt')
+
+if __name__ == "__main__":
+    random_numbers, boards = read_file("input.txt")
     # result = find_first_board(random_numbers, boards)
     result = find_last_board(random_numbers, boards)
-    print(f'Result is {result}')
+    print(f"Result is {result}")
