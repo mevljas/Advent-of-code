@@ -1,77 +1,115 @@
-import collections
-import copy
-from warnings import warn
+from numpy import Inf
 import heapq
 
 
-
-def read_file(filename):
-    """
-    Read input file and save risk levels into a list.
-    :param filename: input file
-    :return: matrix
-    """
-    matrix = []
-    with open(filename, 'r', encoding='UTF-8') as file:
-        for line in file:
-            line = [int(d) for d in line.strip()]
-            matrix.append(line)
-
-        return matrix
-
-
-
-def multiply_matrix(matrix, n):
-    new_matrix = []
-    for line in matrix:
-        new_line = []
-        for i in range(0, n):
-            for number in line:
-                new_number = number + i
-                new_number = new_number - 9 if new_number > 9 else new_number
-                new_line.append(new_number)
-        new_matrix.append(new_line)
-
-    matrix = copy.deepcopy(new_matrix)
-    new_matrix = []
-    for i in range(0, n):
-        for line in matrix:
-            new_line = []
-            for number in line:
-                new_number = number + i
-                new_number = new_number - 9 if new_number > 9 else new_number
-                new_line.append(new_number)
-            new_matrix.append(new_line)
-
-    return new_matrix
-
-
-# A Naive recursive implementation of MCP(Minimum Cost Path) problem
-
-import sys
-
-
-# Returns cost of minimum cost path from (0,0) to (m, n) in mat[R][C]
-def minCost(cost, m, n):
-    if (n < 0 or m < 0):
-        return sys.maxsize
-    elif (m == 0 and n == 0):
-        return 0
-    else:
-        return cost[m][n] + min(minCost(cost, m - 1, n),
-                                minCost(cost, m, n - 1))
-
-
-
 def main():
-    maze = read_file('input.txt')
-    maze = multiply_matrix(maze, 5)
+    with open("input.txt") as f:
+        matrix = [[int(i) for i in j] for j in f.read().splitlines()]
+
+    matrix = multiply_matrix(matrix)
+
+    solution = astar_solve(matrix)
+    print(solution)
 
 
-    # G Driver program to test above functions
-    print(minCost(maze, len(maze) - 1, len(maze[0]) - 1))
+def astar_solve(matrix: list):
+    """solve the puzzle with given input array using A* and a heap queue"""
+
+    start_node: tuple = (0, 0)
+    end_node: tuple = (len(matrix) - 1, len(matrix) - 1)
+
+    open_queue: list = []
+    closed_queue: set = set()
+    parents: dict = {}
+    g_score: dict = {}
+
+    for y in range(len(matrix)):
+        for x in range(len(matrix)):
+            g_score[(y, x)] = Inf  # Set g(n) to infinite for all nodes
+
+    g_score[start_node] = 0  # Let g(n) for start node = 0
+    heapq.heappush(
+        open_queue, (get_cityblock(start_node, end_node), start_node)
+    )  # add start node to queue
+
+    while open_queue:
+        _, node = heapq.heappop(open_queue)  # pop the node with lowest f(n)
+
+        if node == end_node:
+            # if we have reached the goal node, trace back path and add up total
+            total = 0
+
+            while node in parents:
+                x = node[0]
+                y = node[1]
+                total += matrix[y][x]
+                node = parents[node]
+            return total
+
+        elif node in closed_queue:
+            continue  # if node in closed queue, skip
+
+        else:
+            neighbours = get_neighbours(matrix, node)
+
+            for neighbour in neighbours:
+                if neighbour in closed_queue:
+                    continue  # if neighbour in closed queue, skip
+                x = neighbour[0]
+                y = neighbour[1]
+                added_g_score = matrix[y][x]
+
+                candidate_g = g_score[node] + added_g_score
+
+                if candidate_g <= g_score[neighbour]:
+                    g_score[neighbour] = candidate_g
+                    parents[neighbour] = node
+                    f = (
+                        get_cityblock(neighbour, end_node) + candidate_g
+                    )  # calculate f(n) = h(n) + g(n)
+                    heapq.heappush(
+                        open_queue, (f, neighbour)
+                    )  # add neighbour and its f(n) to the heap
+
+            closed_queue.add(node)
 
 
+def get_cityblock(a, b):
+    """return cityblock distance from node a to node b"""
+    return abs(a[0] - b[0]) + abs(a[1] - b[1])
 
-if __name__ == '__main__':
-   main()
+
+def get_neighbours(data, node):
+    """get neighbours of target node and check if within bounds"""
+    x = node[0]
+    y = node[1]
+    node_neighbours: list = []
+
+    neighbours: list = [(x + 1, y), (x - 1, y), (x, y + 1), (x, y - 1)]
+
+    for i in neighbours:
+        if (0 <= i[0] <= len(data) - 1) and (0 <= i[1] <= len(data) - 1):
+            node_neighbours.append(i)  # append to list only if within bounds
+    return node_neighbours
+
+
+def multiply_matrix(matrix: list):
+    """returns the data as a 2d array extended 5 times in each direction"""
+    current_size: int = len(matrix)
+    new_size: int = len(matrix) * 5
+    extended_data: list = [
+        [0 for _ in range(new_size)] for _ in range(new_size)
+    ]  # pad an empty array with zeros
+
+    for y_index, y in enumerate(extended_data):
+        for x_index, x in enumerate(y):
+            n = matrix[y_index % current_size][x_index % current_size]
+            extended_data[y_index][x_index] = (
+                n + ((y_index // current_size) + (x_index // current_size)) - 1
+            ) % 9 + 1  # formula: i = (n - 1) % 9 + 1
+
+    return extended_data
+
+
+if __name__ == "__main__":
+    main()
