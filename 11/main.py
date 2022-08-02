@@ -5,7 +5,7 @@ def read_file(filename):
     :return: grid of octopuses
     """
     grid = []
-    with open(filename, 'r', encoding='UTF-8') as file:
+    with open(filename, "r", encoding="UTF-8") as file:
         for line in file:
             grid.append([int(s) for s in list(line.strip())])
     return grid
@@ -50,11 +50,16 @@ def model_light(grid, steps):
                             grid[i - 1][j - 1] += 1
                         if i > 0 and j < len(grid[i]) - 1 and grid[i - 1][j + 1]:
                             grid[i - 1][j + 1] += 1
-                        if i < len(grid) - 1 and j < len(grid[i]) - 1 and grid[i + 1][j + 1]:
+                        if (
+                            i < len(grid) - 1
+                            and j < len(grid[i]) - 1
+                            and grid[i + 1][j + 1]
+                        ):
                             grid[i + 1][j + 1] += 1
                         if i < len(grid) - 1 and j > 0 and grid[i + 1][j - 1]:
                             grid[i + 1][j - 1] += 1
     return flashes
+
 
 def all_flashing_steps(grid):
     """
@@ -67,7 +72,7 @@ def all_flashing_steps(grid):
     n_of_octopuses = len(grid) * len(grid[0])
     current_flashes = 0
     flashed = 0
-    while(flashed != n_of_octopuses):
+    while flashed != n_of_octopuses:
         steps += 1
         previous_flashes = -1
         for i in range(0, len(grid)):
@@ -101,7 +106,11 @@ def all_flashing_steps(grid):
                             grid[i - 1][j - 1] += 1
                         if i > 0 and j < len(grid[i]) - 1 and grid[i - 1][j + 1]:
                             grid[i - 1][j + 1] += 1
-                        if i < len(grid) - 1 and j < len(grid[i]) - 1 and grid[i + 1][j + 1]:
+                        if (
+                            i < len(grid) - 1
+                            and j < len(grid[i]) - 1
+                            and grid[i + 1][j + 1]
+                        ):
                             grid[i + 1][j + 1] += 1
                         if i < len(grid) - 1 and j > 0 and grid[i + 1][j - 1]:
                             grid[i + 1][j - 1] += 1
@@ -109,8 +118,8 @@ def all_flashing_steps(grid):
     return steps
 
 
-if __name__ == '__main__':
-    grid = read_file('input.txt')
+if __name__ == "__main__":
+    grid = read_file("input.txt")
     # flashes = model_light(grid, 100)
     steps = all_flashing_steps(grid)
     print(steps)

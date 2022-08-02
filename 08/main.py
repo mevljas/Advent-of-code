@@ -5,10 +5,12 @@ def read_file(filename):
     :return: list of signals
     """
     signals = []
-    with open(filename, 'r', encoding='UTF-8') as file:
+    with open(filename, "r", encoding="UTF-8") as file:
         for line in file:
             unique_signal_patterns, four_digit_output = line.rstrip().split(" | ")
-            signals.append([unique_signal_patterns.split(" "), four_digit_output.split(" ")])
+            signals.append(
+                [unique_signal_patterns.split(" "), four_digit_output.split(" ")]
+            )
 
     return signals
 
@@ -105,8 +107,8 @@ def generate_decode_table(unique_signal_patterns):
     return dt
 
 
-if __name__ == '__main__':
-    signals = read_file('input.txt')
+if __name__ == "__main__":
+    signals = read_file("input.txt")
     # print(signals)
     # unique_number_of_segments = count_unique_number_of_segments(signals)
     # print(unique_number_of_segments)

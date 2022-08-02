@@ -12,7 +12,9 @@ def can_visit_small_cave(path, node):
     if node not in path:
         return True
 
-    filtered_list = list(filter(lambda n: n.islower() and n not in {'start', 'end'}, path))
+    filtered_list = list(
+        filter(lambda n: n.islower() and n not in {"start", "end"}, path)
+    )
 
     if len(filtered_list) == len(set(filtered_list)):
         return True
@@ -58,11 +60,11 @@ class Graph:
         path.append(v)
         # print(v, end=' ')
 
-        if v == 'end':
+        if v == "end":
             self.paths.append(path)
             return
 
-        if v.islower() and v not in {'start', 'end'}:
+        if v.islower() and v not in {"start", "end"}:
             visited.add(v)
 
         # Recur for all the vertices
@@ -81,7 +83,7 @@ class Graph:
         """
 
         # Create a set to store visited vertices
-        visited = {'start'}
+        visited = {"start"}
 
         # Call the recursive helper function
         # to find DFS traversal
@@ -106,17 +108,23 @@ class Graph:
         path.append(v)
         # print(v, end=' ')
 
-        if v == 'end':
+        if v == "end":
             self.paths.append(path)
             return
 
-        if v.islower() and v not in {'start', 'end'}:
+        if v.islower() and v not in {"start", "end"}:
             visited.add(v)
 
         # Recur for all the vertices
         # adjacent to this vertex
-        for neighbour in set(self.graph[v]).difference(visited.intersection({'start', 'end'})):
-            if neighbour.islower() and neighbour not in {'start', 'end'} and not can_visit_small_cave(path, neighbour):
+        for neighbour in set(self.graph[v]).difference(
+            visited.intersection({"start", "end"})
+        ):
+            if (
+                neighbour.islower()
+                and neighbour not in {"start", "end"}
+                and not can_visit_small_cave(path, neighbour)
+            ):
                 continue
             self.dfs_util2(neighbour, visited, path)
 
@@ -131,7 +139,7 @@ class Graph:
         """
 
         # Create a set to store visited vertices
-        visited = {'start'}
+        visited = {"start"}
 
         # Call the recursive helper function
         # to find DFS traversal
@@ -146,7 +154,7 @@ def read_file(filename):
     :return: graph of nodes
     """
     graph = Graph()
-    with open(filename, 'r', encoding='UTF-8') as file:
+    with open(filename, "r", encoding="UTF-8") as file:
         for line in file:
             a, b = line.strip().split("-")
             graph.add_ege(a, b)
@@ -155,8 +163,8 @@ def read_file(filename):
     return graph
 
 
-if __name__ == '__main__':
-    graph = read_file('input.txt')
+if __name__ == "__main__":
+    graph = read_file("input.txt")
     # dfs = graph.dfs('start')
-    dfs = graph.dfs2('start')
+    dfs = graph.dfs2("start")
     print(len(dfs))

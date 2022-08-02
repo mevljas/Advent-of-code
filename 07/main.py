@@ -5,7 +5,7 @@ def read_file(filename):
     :return: list of crabs
     """
     crabs = []
-    with open(filename, 'r', encoding='UTF-8') as file:
+    with open(filename, "r", encoding="UTF-8") as file:
         for line in file:
             for number in line.split(","):
                 crabs.append(int(number))
@@ -30,19 +30,29 @@ def find_cheapest_fuel(crabs):
 
     return min_fuel_sum
 
+
 def find_cheapest_fuel_improved(crabs):
     """
     Find cheapest fuel consumption combination with different steps
     :param crabs: list of crabs
     :return: cheapest sum of fuel consumption
     """
-    fuel_consumption = lambda crab_position, new_position: sum(cost for cost in range(abs(crab_position - new_position) + 1))
+    fuel_consumption = lambda crab_position, new_position: sum(
+        cost for cost in range(abs(crab_position - new_position) + 1)
+    )
 
-    return min([sum(fuel_consumption(crab_position, new_position) for crab_position in crabs) for new_position in range(max(crabs))])
+    return min(
+        [
+            sum(
+                fuel_consumption(crab_position, new_position) for crab_position in crabs
+            )
+            for new_position in range(max(crabs))
+        ]
+    )
 
 
-if __name__ == '__main__':
-    crabs = read_file('input.txt')
+if __name__ == "__main__":
+    crabs = read_file("input.txt")
     min_fuel_consumption = find_cheapest_fuel(crabs)
     min_fuel_consumption_improved = find_cheapest_fuel_improved(crabs)
     print(crabs)

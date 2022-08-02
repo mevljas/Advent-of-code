@@ -5,7 +5,7 @@ def read_file(filename):
     :return: dictionary of fish grouped by age
     """
     fish = dict.fromkeys([0, 1, 2, 3, 4, 5, 6, 7, 8], 0)
-    with open(filename, 'r', encoding='UTF-8') as file:
+    with open(filename, "r", encoding="UTF-8") as file:
         for line in file:
             for number in line.split(","):
                 fish[int(number)] += 1
@@ -48,8 +48,8 @@ def count_fish(fish):
     return counter
 
 
-if __name__ == '__main__':
-    fish = read_file('input.txt')
+if __name__ == "__main__":
+    fish = read_file("input.txt")
     # fish = simulate_fish(fish, 80)
     fish = simulate_fish(fish, 256)
     print(count_fish(fish))

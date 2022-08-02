@@ -6,7 +6,7 @@ def read_file(filename):
     """
 
     commands = {}
-    with open(filename, 'r', encoding='UTF-8') as file:
+    with open(filename, "r", encoding="UTF-8") as file:
         for line in file:
             command, unit = line.strip().split(" ")
             unit = int(unit)
@@ -25,8 +25,8 @@ def calculate_position(commands):
     :return: final location
     """
 
-    horizontal_position = commands.get('forward', 0)
-    depth = commands.get('down', 0) - commands.get('up', 0)
+    horizontal_position = commands.get("forward", 0)
+    depth = commands.get("down", 0) - commands.get("up", 0)
     result = horizontal_position * depth
     return result
 
@@ -41,7 +41,7 @@ def calculate_position_aim(filename):
     aim = 0
     horizontal_position = 0
     depth = 0
-    with open(filename, 'r', encoding='UTF-8') as file:
+    with open(filename, "r", encoding="UTF-8") as file:
         for line in file:
             command, unit = line.strip().split(" ")
             unit = int(unit)
@@ -60,8 +60,8 @@ def calculate_position_aim(filename):
     return result
 
 
-if __name__ == '__main__':
-    commands = read_file('input.txt')
+if __name__ == "__main__":
+    commands = read_file("input.txt")
     # result = calculate_position(commands)
-    result = calculate_position_aim('input.txt')
+    result = calculate_position_aim("input.txt")
     print(result)

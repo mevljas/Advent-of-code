@@ -6,7 +6,7 @@ def read_file(filename):
     """
 
     report = []
-    with open(filename, 'r', encoding='UTF-8') as file:
+    with open(filename, "r", encoding="UTF-8") as file:
         for line in file:
             report.append(line.strip())
 
@@ -78,7 +78,9 @@ def oxygen_generator_rating(report, index):
     if ones >= zeros:
         return oxygen_generator_rating([x for x in report if int(x[index])], index + 1)
     else:
-        return oxygen_generator_rating([x for x in report if not int(x[index])], index + 1)
+        return oxygen_generator_rating(
+            [x for x in report if not int(x[index])], index + 1
+        )
 
 
 def CO2_scrubber_rating(report, index):
@@ -105,7 +107,7 @@ def CO2_scrubber_rating(report, index):
         return CO2_scrubber_rating([x for x in report if int(x[index])], index + 1)
 
 
-if __name__ == '__main__':
-    report = read_file('input.txt')
+if __name__ == "__main__":
+    report = read_file("input.txt")
     result = life_support_rating(report)
     print(result)

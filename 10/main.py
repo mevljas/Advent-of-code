@@ -8,7 +8,7 @@ def read_file(filename):
     :return: list of input lines
     """
     navigation_subsystem = []
-    with open(filename, 'r', encoding='UTF-8') as file:
+    with open(filename, "r", encoding="UTF-8") as file:
         for line in file:
             navigation_subsystem.append(list(line.strip()))
     return navigation_subsystem
@@ -27,26 +27,26 @@ def calculate_syntax_error_score(navigation_subsystem):
         stack = []
         corrupted_line = False
         for character in line:
-            if character in ('(', '[', '{', '<'):
+            if character in ("(", "[", "{", "<"):
                 stack.append(character)
             else:
                 stack_pop = stack.pop() or ""
-                if character == ')' and stack_pop != '(':
+                if character == ")" and stack_pop != "(":
                     score += 3
                     corrupted_line = True
                     continue
 
-                elif character == ']' and stack_pop != '[':
+                elif character == "]" and stack_pop != "[":
                     score += 57
                     corrupted_line = True
                     continue
 
-                elif character == '}' and stack_pop != '{':
+                elif character == "}" and stack_pop != "{":
                     score += 1197
                     corrupted_line = True
                     continue
 
-                elif character == '>' and stack_pop != '<':
+                elif character == ">" and stack_pop != "<":
                     score += 25137
                     corrupted_line = True
                     continue
@@ -67,13 +67,13 @@ def repair_navigation_subsystem(uncomplete_lines):
         score = 0
         for character in reversed(line):
             score *= 5
-            if character == '(':
+            if character == "(":
                 score += 1
-            elif character == '[':
+            elif character == "[":
                 score += 2
-            elif character == '{':
+            elif character == "{":
                 score += 3
-            elif character == '<':
+            elif character == "<":
                 score += 4
 
         scores.append(score)
@@ -81,9 +81,11 @@ def repair_navigation_subsystem(uncomplete_lines):
     return statistics.median(scores)
 
 
-if __name__ == '__main__':
-    navigation_subsystem = read_file('input.txt')
-    syntax_error_score, uncomplete_lines = calculate_syntax_error_score(navigation_subsystem)
+if __name__ == "__main__":
+    navigation_subsystem = read_file("input.txt")
+    syntax_error_score, uncomplete_lines = calculate_syntax_error_score(
+        navigation_subsystem
+    )
     print(syntax_error_score)
     middle_score = repair_navigation_subsystem(uncomplete_lines)
     print(middle_score)
