@@ -1,4 +1,8 @@
+import collections
 import copy
+from warnings import warn
+import heapq
+
 
 
 def read_file(filename):
@@ -15,26 +19,6 @@ def read_file(filename):
 
         return matrix
 
-
-def build_graph(matrix):
-    graph = []
-    for i in range(0, len(matrix)):
-        for j in range(0, len(matrix[i])):
-            current_node = i * len(matrix) + j
-            if i < len(matrix) - 1:
-                # down
-                graph.append((current_node + len(matrix[i + 1]), current_node, matrix[i][j]))
-            if i > 0:
-                # up
-                graph.append((current_node - len(matrix[i - 1]), current_node, matrix[i][j]))
-            if j < len(matrix[0]) - 1:
-                # right
-                graph.append((current_node + 1, current_node, matrix[i][j]))
-            if j > 0:
-                # left
-                graph.append((current_node - 1, current_node, matrix[i][j]))
-
-    return graph
 
 
 def multiply_matrix(matrix, n):
@@ -62,7 +46,32 @@ def multiply_matrix(matrix, n):
     return new_matrix
 
 
+# A Naive recursive implementation of MCP(Minimum Cost Path) problem
+
+import sys
+
+
+# Returns cost of minimum cost path from (0,0) to (m, n) in mat[R][C]
+def minCost(cost, m, n):
+    if (n < 0 or m < 0):
+        return sys.maxsize
+    elif (m == 0 and n == 0):
+        return 0
+    else:
+        return cost[m][n] + min(minCost(cost, m - 1, n),
+                                minCost(cost, m, n - 1))
+
+
+
+def main():
+    maze = read_file('input.txt')
+    maze = multiply_matrix(maze, 5)
+
+
+    # G Driver program to test above functions
+    print(minCost(maze, len(maze) - 1, len(maze[0]) - 1))
+
+
+
 if __name__ == '__main__':
-    matrix = read_file('input.txt')
-    multiplied_matrix = multiply_matrix(matrix, 5)
-    graph = build_graph(matrix)
+   main()
