@@ -56,6 +56,23 @@ def calculate_distance(first: list[ int], second: list[int]) -> int:
     logging.info("The distance is %d.", distance)
     return distance
 
+def calculate_similarity_score(first: list[int], second: list[int]) -> int:
+    """
+    Calculates similarity score between two lists of numbers.
+    Calculates a total similarity score by adding up each number in the left list after multiplying it
+    by the number of times that number appears in the right list.
+    :param first: sorted list of numbers.
+    :param second: sorted list of numbers.
+    :return: similarity score.
+    """
+
+    logging.debug("Calculating similarity score.")
+    score = 0
+    for i in range(len(first)):
+        score += first[i] * second.count(first[i])
+    logging.info("The similarity score is %d.", score)
+    return score
+
 
 def main():
     """
@@ -66,6 +83,7 @@ def main():
     first_numbers, second_numbers = read_file("input.txt")
     first_sorted, second_sorted = sort_numbers(first_numbers, second_numbers)
     distance = calculate_distance(first_sorted, second_sorted)
+    sim_score = calculate_similarity_score(first_sorted, second_sorted)
 
 
 if __name__ == "__main__":
