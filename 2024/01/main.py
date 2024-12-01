@@ -37,9 +37,7 @@ def sort_numbers(first_numbers: list[int], second_numbers: list[int]) -> (list[i
     return sorted(first_numbers), sorted(second_numbers)
 
 
-
-
-def calculate_distance(first: list[ int], second: list[int]) -> int:
+def calculate_distance(first: list[int], second: list[int]) -> int:
     """
     Calculates difference between numbers with matching position in both lists.
     For example between first in the first list and the first in the second list.
@@ -56,6 +54,7 @@ def calculate_distance(first: list[ int], second: list[int]) -> int:
     logging.info("The distance is %d.", distance)
     return distance
 
+
 def calculate_similarity_score(first: list[int], second: list[int]) -> int:
     """
     Calculates similarity score between two lists of numbers.
@@ -68,10 +67,32 @@ def calculate_similarity_score(first: list[int], second: list[int]) -> int:
 
     logging.debug("Calculating similarity score.")
     score = 0
+    second_numbers_occurences = count_number_occurences(second)
+
     for i in range(len(first)):
-        score += first[i] * second.count(first[i])
+        number = first[i]
+        score += number * second_numbers_occurences.get(number, 0)
     logging.info("The similarity score is %d.", score)
     return score
+
+
+def count_number_occurences(numbers: list[int]) -> dict[int, int]:
+    """
+    A helper function that counts the number of times each number appears in the list.
+    Used as a cache for calculating similarity score.
+    :param numbers: sorted list of numbers.
+    :return: dictionary with number of occurrences for each number.
+    """
+
+    logging.debug("Counting number occurrences.")
+    occurences = {}
+    for number in numbers:
+        if number in occurences:
+            occurences[number] += 1
+        else:
+            occurences[number] = 1
+    logging.debug("Finished counting number occurrences.")
+    return occurences
 
 
 def main():
