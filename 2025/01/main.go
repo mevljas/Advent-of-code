@@ -1,38 +1,44 @@
 package main
 
 import (
+	"bufio"
 	"fmt"
-	"io"
 	"log"
 	"os"
 )
 
-func readFile() string {
-	f, err := os.Open("input.txt")
+func readFile(filename string) []string {
+	var result []string
+
+	file, err := os.Open(filename)
 	if err != nil {
-		log.Fatalf("failed opening file: %s", err)
+		log.Fatalf("failed to open file: %s", err)
 	}
-	defer f.Close()
+	defer file.Close()
 
-	data, err := io.ReadAll(f)
+	// Create a new scanner to read the file line by line
+	scanner := bufio.NewScanner(file)
 
-	if err != nil {
-		log.Fatalf("failed reading all: %s", err)
+	// Loop through the file and read each line
+	for scanner.Scan() {
+		line := scanner.Text() // Get the line as a string
+		result = append(result, line)
 	}
 
-	body := string(data)
+	// Check for errors during the scan
+	if err := scanner.Err(); err != nil {
+		log.Fatalf("error reading file: %s", err)
+	}
 
-	return body
+	return result
 }
 
 func main() {
 
 	//dial := 50
 
-	fmt.Println(readFile())
+	data := readFile("input1.txt")
 
-	//for i := 1; i <= 5; i++ {
-	//
-	//	fmt.Println("i =", 100/i)
-	//}
+	fmt.Println(data)
+
 }
