@@ -42,7 +42,7 @@ func calculateDialPosition(filename string) {
 
 	dial := 50
 
-	password := 0
+	counter := 0
 
 	fmt.Println("Input : ", data)
 
@@ -76,12 +76,12 @@ func calculateDialPosition(filename string) {
 		}
 
 		if dial == 0 {
-			password += 1
+			counter += 1
 		}
 
 	}
 
-	fmt.Println("Password: ", password)
+	fmt.Println("Password: ", counter)
 
 }
 
