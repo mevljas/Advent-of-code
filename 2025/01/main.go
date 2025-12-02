@@ -9,7 +9,7 @@ import (
 )
 
 const minDial = 0
-const MaxDial = 100
+const MaxDial = 99
 
 func readFile(filename string) []string {
 	var result []string
@@ -37,17 +37,11 @@ func readFile(filename string) []string {
 	return result
 }
 
-func calculateDialPosition(filename string) {
-	data := readFile(filename)
-
+func calculateOldPassword(data []string) {
 	dial := 50
-
-	counter := 0
-
-	fmt.Println("Input : ", data)
+	zeroCounter := 0
 
 	for _, line := range data {
-		//fmt.Println(line)
 
 		direction := string(line[0])
 		number, err := strconv.Atoi(line[1:])
@@ -56,37 +50,96 @@ func calculateDialPosition(filename string) {
 			log.Fatalf("error converting string to int: %s", err)
 		}
 
-		//fmt.Println(direction, number)
-
 		if direction == "R" {
 			dial += number
 
-			for dial >= MaxDial {
-				dial = dial - MaxDial
+			for dial > MaxDial {
+				dial = dial - MaxDial - 1
 			}
 
 		} else if direction == "L" {
 			dial -= number
 
 			for dial < minDial {
-				dial = MaxDial + dial
+				dial = MaxDial + dial + 1
 			}
 		} else {
 			log.Fatalf("invalid direction: %s", direction)
 		}
 
 		if dial == 0 {
-			counter += 1
+			zeroCounter += 1
 		}
 
 	}
 
-	fmt.Println("Password: ", counter)
+	fmt.Println("Old password: ", zeroCounter)
+
+}
+
+func calculateNewPassword(data []string) {
+	dial := 50
+	zeroCounter := 0
+
+	for _, line := range data {
+
+		direction := string(line[0])
+		number, err := strconv.Atoi(line[1:])
+
+		if err != nil {
+			log.Fatalf("error converting string to int: %s", err)
+		}
+
+		previousDial := dial
+		zeroCounter += number / 100
+		number = number % 100
+
+		if direction == "R" {
+			dial += number
+
+		} else if direction == "L" {
+			dial -= number
+
+		}
+
+		if dial > MaxDial {
+			dial = dial - MaxDial - 1
+			if previousDial != 0 {
+				zeroCounter += 1
+			}
+		} else if dial < minDial {
+			dial = MaxDial + dial + 1
+			if previousDial != 0 {
+				zeroCounter += 1
+			}
+		} else if dial == 0 {
+			zeroCounter += 1
+		}
+
+	}
+
+	fmt.Println("New password: ", zeroCounter)
 
 }
 
 func main() {
 
-	calculateDialPosition("input2.txt")
+	input1 := readFile("input1.txt")
+	input2 := readFile("input2.txt")
+	input3 := readFile("input3.txt")
+
+	fmt.Println("Input 1:")
+	calculateOldPassword(input1)
+	calculateNewPassword(input1)
+	fmt.Println()
+
+	fmt.Println("Input 2:")
+	calculateOldPassword(input2)
+	calculateNewPassword(input2)
+	fmt.Println()
+
+	fmt.Println("Input 3:")
+	calculateOldPassword(input3)
+	calculateNewPassword(input3)
 
 }
