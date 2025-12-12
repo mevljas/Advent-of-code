@@ -85,7 +85,9 @@ func readFile(filename string) ([][]int, [][][]int, [][]int) {
 var minButtonsCombination [][]int = nil
 
 func toggleMachinesState(machinesState []int, machine int) []int {
-	newMachineState := machinesState
+	// Create a copy 
+	newMachineState := make([]int, len(machinesState))
+	copy(newMachineState, machinesState)
 
 	if newMachineState[machine] == 1 {
 		newMachineState[machine] = 0
@@ -106,13 +108,19 @@ func toggleButton(machinesState []int, button []int) []int {
 }
 
 func tryButtonsCombinations(desiredMachinesState []int, buttons [][]int, currentMachinesState []int, currentlyPressedButtons [][]int, maxDepth int) {
-	if minButtonsCombination == nil && len(desiredMachinesState) == len(currentMachinesState) && reflect.DeepEqual(desiredMachinesState, currentMachinesState) {
-		minButtonsCombination = currentlyPressedButtons
+	// Check if we found a solution
+	if len(desiredMachinesState) == len(currentMachinesState) && reflect.DeepEqual(desiredMachinesState, currentMachinesState) {
+		if minButtonsCombination == nil || len(currentlyPressedButtons) < len(minButtonsCombination) {
+			// Make a copy of the solution
+			solution := make([][]int, len(currentlyPressedButtons))
+			copy(solution, currentlyPressedButtons)
+			minButtonsCombination = solution
+		}
 		return
 	}
 
-	if len(currentlyPressedButtons) < len(minButtonsCombination) && len(desiredMachinesState) == len(currentMachinesState) && reflect.DeepEqual(desiredMachinesState, currentMachinesState) {
-		minButtonsCombination = currentlyPressedButtons
+	// Prune if we've already found a better solution
+	if minButtonsCombination != nil && len(currentlyPressedButtons) >= len(minButtonsCombination) {
 		return
 	}
 
@@ -123,10 +131,12 @@ func tryButtonsCombinations(desiredMachinesState []int, buttons [][]int, current
 	for i := 0; i < len(buttons); i++ {
 		button := buttons[i]
 		newMachinesState := toggleButton(currentMachinesState, button)
-		newPressedButtons := append(currentlyPressedButtons, button)
+		// Create a copy of currentlyPressedButtons to avoid shared state
+		newPressedButtons := make([][]int, len(currentlyPressedButtons)+1)
+		copy(newPressedButtons, currentlyPressedButtons)
+		newPressedButtons[len(currentlyPressedButtons)] = button
 
 		tryButtonsCombinations(desiredMachinesState, buttons, newMachinesState, newPressedButtons, maxDepth)
-
 	}
 
 	return
@@ -134,33 +144,23 @@ func tryButtonsCombinations(desiredMachinesState []int, buttons [][]int, current
 
 // Find the fewest combination of buttons that can satisfy the machine requirements
 func findFewestButtonsCombination(desiredMachinesState []int, buttons [][]int) [][]int {
+	minButtonsCombination = nil
+	currentMachinesState := make([]int, len(desiredMachinesState))
+	var currentlyPressedButtons [][]int
 
-	maxDepth := len(buttons) + 1
+	// Try increasing depths
+	for depth := 1; depth <= len(buttons)*2; depth++ {
+		fmt.Println("Trying depth: ", depth)
 
-	for true {
+		tryButtonsCombinations(desiredMachinesState, buttons, currentMachinesState, currentlyPressedButtons, depth)
 
-		fmt.Println("Trying depth: ", maxDepth)
-
-		currentMachinesState := make([]int, len(desiredMachinesState))
-		minButtonsCombination = nil
-		var currentlyPressedButtons [][]int
-
-		//	Pick a random button to press next
-		for depth := 1; depth < maxDepth; depth++ {
-			tryButtonsCombinations(desiredMachinesState, buttons, currentMachinesState, currentlyPressedButtons, depth)
-
-			if minButtonsCombination != nil {
-				return minButtonsCombination
-			}
-
+		if minButtonsCombination != nil {
+			return minButtonsCombination
 		}
-		maxDepth *= 2
 	}
 
 	fmt.Println("No combination found")
-
 	return nil
-
 }
 
 func solveFirst(filename string) {
@@ -171,6 +171,8 @@ func solveFirst(filename string) {
 	fmt.Println("Machines: ", machines)
 	fmt.Println("Buttons: ", buttons)
 
+	totalButtonPresses := 0
+
 	for i := 0; i < len(machines); i++ {
 		desiredMachinesState := machines[i]
 		buttonsForLine := buttons[i]
@@ -178,15 +180,19 @@ func solveFirst(filename string) {
 		result := findFewestButtonsCombination(desiredMachinesState, buttonsForLine)
 
 		fmt.Println("Result: ", result)
+		if result != nil {
+			totalButtonPresses += len(result)
+		}
 	}
 
-	fmt.Println()
+	fmt.Println("\nTotal button presses:", totalButtonPresses)
 
 }
 
 func main() {
 
 	solveFirst("input1.txt")
+	solveFirst("input2.txt")
 
 	fmt.Println()
 
