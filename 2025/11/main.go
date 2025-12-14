@@ -10,7 +10,16 @@ import (
 	"github.com/dominikbraun/graph"
 )
 
-// readFile parses the input file and builds an adjacency list representation of the graph.
+// State represents the DP state: current node and which checkpoints have been visited.
+// hasFft: true if we've already passed through the 'fft' node
+// hasDac: true if we've already passed through the 'dac' node
+type State struct {
+	node   string
+	hasFft bool
+	hasDac bool
+}
+
+// Reads the input file and builds an adjacency list representation of the graph.
 func readFile(filename string) map[string][]string {
 	connections := make(map[string][]string)
 
@@ -41,12 +50,6 @@ func readFile(filename string) map[string][]string {
 // topologicalSort performs Kahn's algorithm to order nodes so that
 // for every edge A -> B, A comes before B in the ordering.
 // Returns nil if the graph contains a cycle (not a DAG).
-//
-// Algorithm:
-// 1. Count incoming edges (in-degree) for each node
-// 2. Start with nodes that have no incoming edges
-// 3. Remove each node and decrement in-degree of its neighbors
-// 4. When a neighbor's in-degree becomes 0, add it to the queue
 func topologicalSort(connections map[string][]string) []string {
 	// Collect all nodes and count their incoming edges
 	nodes := make(map[string]bool)
@@ -92,28 +95,13 @@ func topologicalSort(connections map[string][]string) []string {
 	return result
 }
 
-// State represents the DP state: current node and which checkpoints have been visited.
-// hasFft: true if we've already passed through the 'fft' node
-// hasDac: true if we've already passed through the 'dac' node
-type State struct {
-	node   string
-	hasFft bool
-	hasDac bool
-}
-
 // countPathsDAG uses dynamic programming on a DAG to count valid paths.
-// This is the key optimization: instead of enumerating all paths (exponential),
-// we compute the count using DP (linear in nodes × states).
-//
-// The idea:
 //   - Process nodes in reverse topological order (from 'out' back to 'svr')
 //   - For each node and each state (hasFft, hasDac), compute how many valid paths
 //     exist from that node to 'out'
 //   - A path is valid if it passes through 'fft' before 'dac'
-//
-// Time complexity: O(V × 4) where V = number of nodes, 4 = number of (hasFft, hasDac) combinations
 func countPathsDAG(connections map[string][]string, start, target string, topologicalOrder []string) int {
-	// Get topological ordering of nodes
+
 	topoOrder := topologicalSort(connections)
 	if topoOrder == nil {
 		fmt.Println("Graph has a cycle - cannot use DP approach")
@@ -121,13 +109,11 @@ func countPathsDAG(connections map[string][]string, start, target string, topolo
 	}
 
 	// Reverse the order so we process from target ('out') backwards to start ('svr')
-	// This way, when we compute dp[node], all dp[neighbor] values are already computed
 	for i, j := 0, len(topoOrder)-1; i < j; i, j = i+1, j-1 {
 		topoOrder[i], topoOrder[j] = topoOrder[j], topoOrder[i]
 	}
 
 	// dp[state] = number of valid paths from state.node to target,
-	//             given that we've already visited fft (if hasFft) and dac (if hasDac)
 	dp := make(map[State]int)
 
 	// Base case: we're at the target node
@@ -140,10 +126,9 @@ func countPathsDAG(connections map[string][]string, start, target string, topolo
 	// Process nodes in reverse topological order (from target back to start)
 	for _, node := range topoOrder {
 		if node == target {
-			continue // Already handled as base case
+			continue
 		}
 
-		// For each combination of (hasFft, hasDac) flags
 		for _, fft := range []bool{false, true} {
 			for _, dac := range []bool{false, true} {
 				state := State{node, fft, dac}
@@ -154,15 +139,13 @@ func countPathsDAG(connections map[string][]string, start, target string, topolo
 				newFft := fft || (node == "fft")
 				newDac := dac || (node == "dac")
 
-				// KEY CONSTRAINT: if we're visiting 'dac', 'fft' must already be visited!
-				// This enforces the "fft before dac" requirement
+				// if we're visiting 'dac', 'fft' must already be visited!
 				if node == "dac" && !fft {
-					dp[state] = 0 // Invalid: visiting dac without having visited fft
+					dp[state] = 0
 					continue
 				}
 
 				// Sum up paths through all neighbors
-				// dp[current] = sum of dp[neighbor] for all outgoing edges
 				total := 0
 				for _, neighbor := range connections[node] {
 					nextState := State{neighbor, newFft, newDac}
@@ -173,14 +156,10 @@ func countPathsDAG(connections map[string][]string, start, target string, topolo
 		}
 	}
 
-	// Answer: count paths from start node, starting with hasFft=false, hasDac=false
-	// (we haven't visited either checkpoint yet when we begin)
 	return dp[State{start, false, false}]
 }
 
 // findAllPaths uses DFS to enumerate all paths from current position to target.
-// WARNING: This is exponential in complexity - only use for small graphs!
-// For large graphs, use countPathsDAG instead.
 func findAllPaths(connections map[string][]string, currentPath []string, visitedDevices map[string]bool, targetDevice string) [][]string {
 
 	allPaths := [][]string{}
@@ -211,8 +190,6 @@ func findAllPaths(connections map[string][]string, currentPath []string, visited
 
 }
 
-// solveFirst solves part 1: count all paths from 'you' to 'out'
-// Uses simple DFS path enumeration (works for small inputs)
 func solveFirst(filename string) {
 	fmt.Println("Solving first task with file: ", filename)
 
@@ -243,9 +220,6 @@ func createGraph(connections map[string][]string) graph.Graph[string, string] {
 	return g
 }
 
-// solveSecond solves part 2: count paths from 'svr' to 'out' that pass through 'fft' before 'dac'
-// Uses DP on DAG for O(V) complexity instead of exponential brute force.
-// The input graph has ~574 nodes and trillions of valid paths - DP is essential!
 func solveSecond(filename string) {
 	fmt.Println("Solving second task with file: ", filename)
 
@@ -260,8 +234,6 @@ func solveSecond(filename string) {
 	topologicalOrder, _ := graph.TopologicalSort(g)
 	fmt.Println("Topological order: ", topologicalOrder)
 
-	// Use DP approach - works because the graph is a DAG (no cycles)
-	// Time complexity: O(V * 4) where V = number of nodes
 	count := countPathsDAG(connections, startDevice, targetDevice, topologicalOrder)
 
 	fmt.Println("Number of paths: ", count)
